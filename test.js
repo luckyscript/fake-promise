@@ -1,12 +1,14 @@
 var Promise = require('.');
-setTimeout(() => {
-    console.log(0)
-}, 0)
+// setTimeout(() => {
+//     console.log(0)
+// }, 0)
 let timeout = new Promise((resolve, reject) => {
     console.log(1)
     resolve(2)
-}).then((v) => {
+})
+timeout.then((v) => {
     console.log(v)
-}).then(() => {
-    console.log("4")
+})
+.then(() => {
+	console.log("v1")
 })

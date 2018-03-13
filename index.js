@@ -3,20 +3,17 @@ class Promise {
     var _self = this;
     this.state = 'pending';
     this.value = null;
-    this.next = [];
     const resolve = (value) => {
       if (_self.state == 'pending') {
         _self.state = 'fulfilled'
         _self.value = value;
-        console.log("hahah", _self.next)
-        _self.next.forEach(v => {
-          console.log(v)
-          v(value);
-        })
       }
     }
-    const reject = () => {
-      
+    const reject = (value) => {
+      if (_self.state == 'pending') {
+        _self.state = 'rejected';
+        _self.value = value
+      }
     }
     if(fn) {
       fn(resolve, reject);
@@ -25,13 +22,21 @@ class Promise {
 
   then(onResolve, onReject) {
     return new Promise((resolve, reject) => {
-      let onResolveFn = (value) => {
+      let onResolveFn = (val) => {
         let ret = onResolve ? onResolve(val) : val;
         resolve(ret);
-        console.log("a")
       }
-      this.next.push(onResolveFn);
-      onResolve(this.value)
+      let onRejectFn = (val) => {
+        let ret = onReject ? onReject(val): val;
+        reject(ret)
+      }
+      console.log(this)
+      if(this.state == 'fulfilled') {
+        onResolveFn(this.value);
+      }
+      if(this.state == 'rejected') {
+        onRejectFn(this.value);
+      }
     })
   }
 }
