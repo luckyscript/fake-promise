@@ -3,10 +3,14 @@ class Promise {
     var _self = this;
     this.state = 'pending';
     this.value = null;
+    this.next = [];
     const resolve = (value) => {
       if (_self.state == 'pending') {
         _self.state = 'fulfilled'
         _self.value = value;
+        _self.next.forEach(v => {
+          process.nextTick(() => v(value))
+        })
       }
     }
     const reject = (value) => {
@@ -16,7 +20,7 @@ class Promise {
       }
     }
     if(fn) {
-      fn(resolve, reject);
+      process.nextTick(() => fn(resolve, reject))
     }
   }
 
@@ -30,7 +34,7 @@ class Promise {
         let ret = onReject ? onReject(val): val;
         reject(ret)
       }
-      console.log(this)
+      this.next.push(onResolveFn);
       if(this.state == 'fulfilled') {
         onResolveFn(this.value);
       }
@@ -38,6 +42,12 @@ class Promise {
         onRejectFn(this.value);
       }
     })
+  }
+
+  static resolve(value) {
+    return new Promise(resolve => {
+      resolve(value)
+    });
   }
 }
 
