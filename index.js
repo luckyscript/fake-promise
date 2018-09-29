@@ -3,19 +3,22 @@ class Promise {
     var _self = this;
     this.state = 'pending';
     this.value = null;
-    this.callback = {};
+    this.callback = {
+      fulfilled: [],
+      rejected: []
+    };
     const resolve = (value) => {
       if (_self.state == 'pending') {
         _self.state = 'fulfilled'
         _self.value = value;
-        _self.callback.fulfilled && _self.callback.fulfilled(value);
+        _self.callback.fulfilled.length && _self.callback.fulfilled.forEach( v=> v(value));
       }
     }
     const reject = (value) => {
       if (_self.state == 'pending') {
         _self.state = 'rejected';
         _self.value = value;
-        _self.callback.rejected && _self.callback.rejected(value);
+        _self.callback.rejected.length && _self.callback.rejected.forEach( v => v(value));
       }
     }
     if(fn) {
@@ -41,8 +44,8 @@ class Promise {
         onRejectFn(this.value);
       }
       if(this.state == 'pending') {
-        this.callback.fulfilled = onResolveFn;
-        this.callback.rejected = onRejectFn;
+        this.callback.fulfilled.push(onResolveFn);
+        this.callback.rejected.push(onRejectFn);
       }
     })
   }
